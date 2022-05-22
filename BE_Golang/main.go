@@ -42,7 +42,7 @@ func main() {
 		AllowOriginFunc: func(origin string) bool {
 			return origin == "https://github.com"
 		},
-		MaxAge: 50 * time.Minute,
+		MaxAge: 500000 * time.Minute,
 	}))
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"Data": "hello world"})
@@ -51,11 +51,17 @@ func main() {
 	r.POST("/provider/id", controllers.FindProviderID)
 	r.GET("/services", controllers.FindServices)
 	r.GET("/services/:count", controllers.LimitServices)
-	r.POST("/requirement", controllers.UpdateRequirementCustomer)
-	r.GET("/provider/services", controllers.ServiceProvider)
+	r.POST("/requirement", controllers.AddRequirementCustomer)
+	r.POST("/provider/services", controllers.ServiceProvider)
 	r.POST("/servicesofprovider", controllers.AddServiceProvider)
-	r.GET("/requirementcustomer", controllers.RequirementsCustomer)
+	r.POST("/requirementcustomer", controllers.RequirementsCustomer)
 	r.POST("/todolist", controllers.TodoList)
 	r.POST("/loggin", controllers.Loggin)
+	r.POST("/priceservices", controllers.FindPriceOfServices)
+	r.POST("/addprice", controllers.AddPrice)
+	r.POST("/addtodolist", controllers.AddTodoList)
+	r.POST("/pagination", controllers.CountPagination)
+	r.POST("/update_todolist", controllers.UpdateTodoList)
+	r.POST("/deleteservices", controllers.DeleteServicesProvider)
 	r.Run(":8080")
 }

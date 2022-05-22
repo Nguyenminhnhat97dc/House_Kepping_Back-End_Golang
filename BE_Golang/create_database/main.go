@@ -131,31 +131,31 @@ func main() {
 	requirement := []models.RequirementsCustomer{
 		{
 			CustomerID:   1,
-			NameServices: "Quét nhà, Lau nhà, Lau kính, Rửa chén, Giặt quần áo, Chăm sóc cây cảnh",
+			NameServices: "Quét nhà, Lau nhà, Dọn nhà, Vệ sinh nhà, Giặt quần áo, Chăm sóc cây cảnh",
 			DayStart:     "11/5/2022, 12/5/2022",
 			TimeStart:    "8:00",
 		},
 		{
 			CustomerID:   2,
-			NameServices: "Quét nhà, Lau nhà, Lau kính, Rửa chén, Giặt quần áo, Chăm sóc cây cảnh",
+			NameServices: "Quét nhà, Lau nhà, Dọn nhà, Vệ sinh nhà, Giặt quần áo, Chăm sóc cây cảnh",
 			DayStart:     "12/5/2022, 13/5/2022",
 			TimeStart:    "8:00",
 		},
 		{
 			CustomerID:   3,
-			NameServices: "Quét nhà, Lau nhà, Lau kính, Rửa chén, Giặt quần áo, Chăm sóc cây cảnh",
+			NameServices: "Quét nhà, Lau nhà, Dọn nhà, Vệ sinh nhà, Giặt quần áo, Chăm sóc cây cảnh",
 			DayStart:     "15/5/2022, 15/5/2022",
 			TimeStart:    "8:00",
 		},
 		{
 			CustomerID:   5,
-			NameServices: "Quét nhà, Lau nhà, Lau kính, Rửa chén, Giặt quần áo, Chăm sóc cây cảnh",
+			NameServices: "Quét nhà, Lau nhà, Dọn nhà, Vệ sinh nhà, Giặt quần áo, Chăm sóc cây cảnh",
 			DayStart:     "16/5/2022, 17/5/2022",
 			TimeStart:    "8:00",
 		},
 		{
 			CustomerID:   5,
-			NameServices: "Quét nhà, Lau nhà, Lau kính, Rửa chén, Giặt quần áo, Chăm sóc cây cảnh",
+			NameServices: "Quét nhà, Lau nhà, Dọn nhà, Vệ sinh nhà, Giặt quần áo, Chăm sóc cây cảnh",
 			DayStart:     "18/5/2022, 19/5/2022",
 			TimeStart:    "8:00",
 		},
