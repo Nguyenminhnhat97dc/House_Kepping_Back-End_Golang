@@ -6,6 +6,7 @@ type Provider struct {
 	gorm.Model
 	Name      string `gorm:"type: nvarchar(50); not null"`
 	Address   string `gorm:"type: nvarchar(100); not null"`
+	CCCD      string `gorm:"type: varchar(12); not null"`
 	Phone     string `gorm:"type: nvarchar(11); not null"`
 	Introduce string `gorm:"type: varchar(10); not null"`
 }

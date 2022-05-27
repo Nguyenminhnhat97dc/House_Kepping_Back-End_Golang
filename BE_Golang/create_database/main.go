@@ -26,17 +26,17 @@ func main() {
 	db.AutoMigrate(models.ToDoList{})
 	// insert Provider
 	provider := []models.Provider{
-		{Name: "Nguyễn Minh Nhật", Address: "Cam Ranh - Khánh Hòa", Phone: "0975661107", Introduce: "abc"},
-		{Name: "Hà Anh Tuấn", Address: "Đức Trọng - Lâm Đồng", Phone: "0867676745", Introduce: "abc"},
-		{Name: "Trần Minh Tuấn", Address: "Đức Trọng - Lâm Đồng", Phone: "0961055050", Introduce: "abc"},
-		{Name: "Võ Tiến Hải", Address: "Cam Ranh - Khánh Hòa", Phone: "0971150202", Introduce: "abc"},
-		{Name: "Đào Quốc Sang", Address: "Đức Trọng - Lâm Đồng", Phone: "0961165050", Introduce: "abc"},
-		{Name: "Trần Minh Tiến", Address: "Cam Ranh - Khánh Hòa", Phone: "0961980303", Introduce: "abc"},
-		{Name: "Nguyễn Hữu Lộc", Address: "Đức Trọng - Lâm Đồng", Phone: "0961853030", Introduce: "abc"},
-		{Name: "Võ Duy Tôn", Address: "Cam Ranh - Khánh Hòa", Phone: "0961232200", Introduce: "abc"},
-		{Name: "Lê Trần Khánh Vy", Address: "Đức Trọng - Lâm Đồng", Phone: "0971170011", Introduce: "abc"},
-		{Name: "Hoàng Minh Vương", Address: "Cam Ranh - Khánh Hòa", Phone: "0971230077", Introduce: "abc"},
-		{Name: "Ưng Vi Vương", Address: "Đức Trọng - Lâm Đồng", Phone: "0961854040", Introduce: "abc"},
+		{Name: "Nguyễn Minh Nhật", Address: "Cam Ranh - Khánh Hòa", CCCD: "037153000257", Phone: "0975661107", Introduce: "abc"},
+		{Name: "Hà Anh Tuấn", Address: "Đức Trọng - Lâm Đồng", CCCD: "065842695782", Phone: "0867676745", Introduce: "abc"},
+		{Name: "Trần Minh Tuấn", Address: "Đức Trọng - Lâm Đồng", CCCD: "052478632591", Phone: "0961055050", Introduce: "abc"},
+		{Name: "Võ Tiến Hải", Address: "Cam Ranh - Khánh Hòa", CCCD: "021589635874", Phone: "0971150202", Introduce: "abc"},
+		{Name: "Đào Quốc Sang", Address: "Đức Trọng - Lâm Đồng", CCCD: "096358614752", Phone: "0961165050", Introduce: "abc"},
+		{Name: "Trần Minh Tiến", Address: "Cam Ranh - Khánh Hòa", CCCD: "052651472369", Phone: "0961980303", Introduce: "abc"},
+		{Name: "Nguyễn Hữu Lộc", Address: "Đức Trọng - Lâm Đồng", CCCD: "036541258520", Phone: "0961853030", Introduce: "abc"},
+		{Name: "Võ Duy Tôn", Address: "Cam Ranh - Khánh Hòa", CCCD: "036589741252", Phone: "0961232200", Introduce: "abc"},
+		{Name: "Lê Trần Khánh Vy", Address: "Đức Trọng - Lâm Đồng", CCCD: "041259875602", Phone: "0971170011", Introduce: "abc"},
+		{Name: "Hoàng Minh Vương", Address: "Cam Ranh - Khánh Hòa", CCCD: "065842675105", Phone: "0971230077", Introduce: "abc"},
+		{Name: "Ưng Vi Vương", Address: "Đức Trọng - Lâm Đồng", CCCD: "0751423654892", Phone: "0961854040", Introduce: "abc"},
 	}
 	db.Create(&provider)
 	//insert User
@@ -83,16 +83,30 @@ func main() {
 		{ServicesId: 1, ProviderID: 3, Price: 500.000},
 		{ServicesId: 2, ProviderID: 3, Price: 500.000},
 		{ServicesId: 3, ProviderID: 3, Price: 500.000},
+		{ServicesId: 4, ProviderID: 3, Price: 500.000},
+		{ServicesId: 5, ProviderID: 3, Price: 500.000},
+		{ServicesId: 6, ProviderID: 3, Price: 500.000},
+
+		{ServicesId: 1, ProviderID: 4, Price: 500.000},
+		{ServicesId: 2, ProviderID: 4, Price: 500.000},
+		{ServicesId: 3, ProviderID: 4, Price: 500.000},
 		{ServicesId: 4, ProviderID: 4, Price: 500.000},
 		{ServicesId: 5, ProviderID: 4, Price: 500.000},
 		{ServicesId: 6, ProviderID: 4, Price: 500.000},
 
-		{ServicesId: 1, ProviderID: 6, Price: 500.000},
-		{ServicesId: 2, ProviderID: 6, Price: 500.000},
-		{ServicesId: 3, ProviderID: 6, Price: 500.000},
+		{ServicesId: 1, ProviderID: 5, Price: 500.000},
+		{ServicesId: 2, ProviderID: 5, Price: 500.000},
+		{ServicesId: 3, ProviderID: 5, Price: 500.000},
 		{ServicesId: 4, ProviderID: 5, Price: 500.000},
 		{ServicesId: 5, ProviderID: 5, Price: 500.000},
 		{ServicesId: 6, ProviderID: 5, Price: 500.000},
+
+		{ServicesId: 1, ProviderID: 6, Price: 500.000},
+		{ServicesId: 2, ProviderID: 6, Price: 500.000},
+		{ServicesId: 3, ProviderID: 6, Price: 500.000},
+		{ServicesId: 4, ProviderID: 6, Price: 500.000},
+		{ServicesId: 5, ProviderID: 6, Price: 500.000},
+		{ServicesId: 6, ProviderID: 6, Price: 500.000},
 
 		{ServicesId: 1, ProviderID: 7, Price: 500.000},
 		{ServicesId: 2, ProviderID: 7, Price: 500.000},
@@ -100,20 +114,6 @@ func main() {
 		{ServicesId: 4, ProviderID: 7, Price: 500.000},
 		{ServicesId: 5, ProviderID: 7, Price: 500.000},
 		{ServicesId: 6, ProviderID: 7, Price: 500.000},
-
-		{ServicesId: 1, ProviderID: 8, Price: 500.000},
-		{ServicesId: 2, ProviderID: 8, Price: 500.000},
-		{ServicesId: 3, ProviderID: 9, Price: 500.000},
-		{ServicesId: 4, ProviderID: 9, Price: 500.000},
-		{ServicesId: 5, ProviderID: 9, Price: 500.000},
-		{ServicesId: 6, ProviderID: 9, Price: 500.000},
-
-		{ServicesId: 1, ProviderID: 10, Price: 500.000},
-		{ServicesId: 2, ProviderID: 11, Price: 500.000},
-		{ServicesId: 3, ProviderID: 11, Price: 500.000},
-		{ServicesId: 4, ProviderID: 11, Price: 500.000},
-		{ServicesId: 5, ProviderID: 11, Price: 500.000},
-		{ServicesId: 6, ProviderID: 11, Price: 500.000},
 	}
 	db.Create((&servicesOfProvider))
 
