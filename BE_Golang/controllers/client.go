@@ -13,11 +13,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+
+	//"gorm.io/driver/mysql"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+/* var host = "ec2-34-230-153-41.compute-1.amazonaws.com"
+var user = "gqkzhktjpbsnix"
+var password = "3cc9ee2fd230e1696ee764c83ef829474e27577be64388c849031eb618a637ab"
+var dbname = "d2u77vk80vvs75"
+var dsn = "host=" + host + "user=" + user + "password=" + password + "dbname=" + dbname + "port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+*/
+//var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+var dsn = "sql6496052:JVUfiJ9mBJ@tcp(sql6.freemysqlhosting.net:3306)/sql6496052?charset=utf8mb4&parseTime=True&loc=Local"
 var upGrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,

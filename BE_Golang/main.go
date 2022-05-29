@@ -5,6 +5,7 @@ import (
 	//"log"
 	"net/http"
 	//"time"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -82,7 +83,12 @@ func jsonApi(c *gin.Context) {
 */
 
 func main() {
-	r := gin.Default()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	r := gin.New()
+	//r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST"},
@@ -115,5 +121,6 @@ func main() {
 	r.POST("/update_todolist", controllers.UpdateTodoList)
 	r.POST("/deleteservices", controllers.DeleteServicesProvider)
 	r.POST("/updateprovider", controllers.UpdateInformationProvider)
-	r.Run(":8080")
+
+	r.Run(":" + port)
 }

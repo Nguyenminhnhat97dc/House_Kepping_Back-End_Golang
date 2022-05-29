@@ -4,18 +4,42 @@ import (
 	"BE_Golang/BE_Golang/create_database/models"
 	"fmt"
 
+	//"gorm.io/driver/postgres"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
+/* var (
+	host     string = "ec2-34-230-153-41.compute-1.amazonaws.com"
+	port     string = "5432"
+	username string = "gqkzhktjpbsnix"
+	password string = "3cc9ee2fd230e1696ee764c83ef829474e27577be64388c849031eb618a637ab"
+	database string = "d2u77vk80vvs75"
+) */
+
+var DB *gorm.DB
+
 func main() {
-	dsn := "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	//dsn := "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "sql6496052:JVUfiJ9mBJ@tcp(sql6.freemysqlhosting.net:3306)/sql6496052?charset=utf8mb4&parseTime=True&loc=Local"
+	fmt.Println(dsn)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
 	}
+
+	/* dsn := "host=" + host + " user=" + username + " password=" + password + " dbname=" + database + " port=" + port + " TimeZone=Asia/Shanghai"
+	fmt.Println(dsn)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database.")
+	} else {
+		fmt.Println("connect Successfull.")
+	} */
+	db.AutoMigrate()
 	// Create Table
 	db.AutoMigrate(models.Provider{})
 	db.AutoMigrate(models.User{})
@@ -40,7 +64,7 @@ func main() {
 	}
 	db.Create(&provider)
 	//insert User
-	user := []models.User{
+	userr := []models.User{
 		{UserName: "nguyenminhnhat", Password: "123456", ProviderID: 1},
 		{UserName: "haanhtuan", Password: "123456", ProviderID: 2},
 		{UserName: "tranminhtuan", Password: "123456", ProviderID: 3},
@@ -53,7 +77,7 @@ func main() {
 		{UserName: "hoangminhvuong", Password: "123456", ProviderID: 10},
 		{UserName: "ungvivuong", Password: "123456", ProviderID: 11},
 	}
-	db.Create(&user)
+	db.Create(&userr)
 	// inser Services
 	services := []models.Services{
 		{NameServices: "Dọn nhà", Image: "don-nha-theo-gio", Introduce: "link_gioithieu"},
