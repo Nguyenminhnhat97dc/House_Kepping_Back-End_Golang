@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"BE_Golang/BE_Golang/create_database/models"
-	database "BE_Golang/Be_Golang/connect_database"
+	database "BE_Golang/Be_Golang/connectDatabase"
 	"bytes"
 	"encoding/json"
 	"fmt"
