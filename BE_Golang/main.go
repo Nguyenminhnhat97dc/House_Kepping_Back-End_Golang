@@ -89,7 +89,7 @@ func main() {
 	}
 	r := gin.New()
 	//r := gin.Default()
-	r.Use(cors.New(cors.Config{
+	/* r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST"},
 		AllowHeaders:     []string{"Origin, Authorization, Content-Type"},
@@ -98,7 +98,8 @@ func main() {
 		AllowOriginFunc: func(origin string) bool {
 			return origin == "http://localhost:8080"
 		},
-	}))
+	})) */
+	r.Use(cors.Default())
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"Data": "hello world"})
 	})

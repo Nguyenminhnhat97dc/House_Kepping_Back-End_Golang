@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	//database "BE_Golang/Be_Golang/connect_database"
 	"BE_Golang/BE_Golang/create_database/models"
+	database "BE_Golang/Be_Golang/connect_database"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -13,9 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-
-	//"gorm.io/driver/mysql"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -27,6 +24,7 @@ var dbname = "d2u77vk80vvs75"
 var dsn = "host=" + host + "user=" + user + "password=" + password + "dbname=" + dbname + "port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 */
 //var dsn = "root:@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+
 var dsn = "sql6496052:JVUfiJ9mBJ@tcp(sql6.freemysqlhosting.net:3306)/sql6496052?charset=utf8mb4&parseTime=True&loc=Local"
 var upGrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -59,9 +57,19 @@ func FindServices(c *gin.Context) {
 	var services []models.Services
 	if err := dbConnect.Find(&services).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := dbConnect.DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": services})
+		sqlDB, err := dbConnect.DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	}
 }
@@ -79,11 +87,22 @@ func LimitServices(c *gin.Context) {
 	number, _ := strconv.Atoi(count)
 	if err := dbConnect.Limit(number).Find(&services).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := dbConnect.DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": services})
+		sqlDB, err := dbConnect.DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	}
+
 }
 
 func PrettyString(str string) (string, error) {
@@ -96,12 +115,12 @@ func PrettyString(str string) (string, error) {
 
 //
 func AddRequirementCustomer(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type CheckCustomer struct {
 		Name         string
 		Address      string
@@ -125,18 +144,23 @@ func AddRequirementCustomer(c *gin.Context) {
 	}
 	json.Unmarshal([]byte(res), &checkCustomer)
 	abc := checkCustomer.Name
-	if err := dbConnect.Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer).Error; err != nil {
+	if err := database.DBConn().Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer).Error; err != nil {
 		NewCustomer := models.Customer{
 			NameCustomer:    checkCustomer.Name,
 			AddressCustomer: checkCustomer.Address,
 			PhoneCustomer:   checkCustomer.Phone,
 		}
 		fmt.Println("THEM KH", NewCustomer)
-		if err := dbConnect.Create(&NewCustomer).Error; err != nil {
+		if err := database.DBConn().Create(&NewCustomer).Error; err != nil {
 			c.JSON(http.StatusOK, gin.H{"result": "Không  insert Khách Hàng được"})
+			sqlDB, err := database.DBConn().DB()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			defer sqlDB.Close()
 			return
 		} else {
-			dbConnect.Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer)
+			database.DBConn().Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer)
 			NewRequirement := models.RequirementsCustomer{
 				CustomerID:   Customer.ID,
 				NameServices: checkCustomer.NameServices,
@@ -144,20 +168,40 @@ func AddRequirementCustomer(c *gin.Context) {
 				TimeStart:    checkCustomer.TimeStart,
 			}
 			fmt.Println(">>requirement", NewRequirement)
-			if err := dbConnect.Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
-				if err := dbConnect.Create(&NewRequirement).Error; err != nil {
+			if err := database.DBConn().Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
+				if err := database.DBConn().Create(&NewRequirement).Error; err != nil {
 					c.JSON(http.StatusOK, gin.H{"result": "create - không Insert yêu cầu khách hàng insert được"})
+					sqlDB, err := database.DBConn().DB()
+					if err != nil {
+						log.Fatalln(err)
+					}
+					defer sqlDB.Close()
 					return
 				} else {
 					c.JSON(http.StatusOK, gin.H{"result": "Insert yêu cầu khách hàng thành công"})
+					sqlDB, err := database.DBConn().DB()
+					if err != nil {
+						log.Fatalln(err)
+					}
+					defer sqlDB.Close()
 					return
 				}
 			} else {
-				if err := dbConnect.Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
+				if err := database.DBConn().Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
 					c.JSON(http.StatusOK, gin.H{"result": "Không Update được"})
+					sqlDB, err := database.DBConn().DB()
+					if err != nil {
+						log.Fatalln(err)
+					}
+					defer sqlDB.Close()
 					return
 				} else {
 					c.JSON(http.StatusOK, gin.H{"result": "Update thành công"})
+					sqlDB, err := database.DBConn().DB()
+					if err != nil {
+						log.Fatalln(err)
+					}
+					defer sqlDB.Close()
 					return
 				}
 			}
@@ -169,20 +213,40 @@ func AddRequirementCustomer(c *gin.Context) {
 			DayStart:     checkCustomer.DayStart,
 			TimeStart:    checkCustomer.TimeStart,
 		}
-		if err := dbConnect.Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
-			if err := dbConnect.Create(&NewRequirement).Error; err != nil {
+		if err := database.DBConn().Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
+			if err := database.DBConn().Create(&NewRequirement).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "không Insert yêu cầu khách hàng insert được"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "Insert yêu cầu khách hàng thành công"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			}
 		} else {
-			if err := dbConnect.Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
+			if err := database.DBConn().Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "Không Update được"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "Update thành công"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			}
 		}
@@ -230,7 +294,7 @@ func ServiceProvider(c *gin.Context) {
 			log.Println("Lỗi ở đây nè error write json: " + err.Error())
 		}
 
-		time.Sleep(2 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 
 	/* type CheckProvider struct {
@@ -260,12 +324,14 @@ func ServiceProvider(c *gin.Context) {
 }
 
 func AddServiceProvider(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type GetServicesOfProvider struct {
 		ServicesId uint
 		ProviderId uint
@@ -281,11 +347,21 @@ func AddServiceProvider(c *gin.Context) {
 		ProviderID: getServicesOfProvider.ProviderId,
 		Price:      getServicesOfProvider.Price,
 	}
-	if err := dbConnect.Create(&AddNewServiceProvider).Error; err != nil {
+	if err := database.DBConn().Create(&AddNewServiceProvider).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": "true"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	}
 }
@@ -318,7 +394,6 @@ func RequirementsCustomer(c *gin.Context) {
 		if err := dbConnect.Raw(
 			"SELECT requirements_customers.id,requirements_customers.name_services,requirements_customers.day_start,requirements_customers.time_start,customers.name_customer,customers.address_customer,customers.phone_customer"+
 				" FROM requirements_customers,customers WHERE requirements_customers.customer_id = customers.id and requirements_customers.status = ?", 0).Scan(&informationRequirementsCustomer).Error; err != nil {
-
 			err = ws.WriteJSON("False")
 			if err != nil {
 				log.Println("error write json: " + err.Error())
@@ -476,12 +551,14 @@ func TodoList(c *gin.Context) {
 }
 
 func Loggin(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type CheckLoggin struct {
 		User     string
 		Password string
@@ -492,22 +569,34 @@ func Loggin(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkLoggin)
-	if err := dbConnect.Where("user_name = ? and password = ?", checkLoggin.User, checkLoggin.Password).First(&informationLoggin).Error; err != nil {
+	if err := database.DBConn().Where("user_name = ? and password = ?", checkLoggin.User, checkLoggin.Password).First(&informationLoggin).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": informationLoggin})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	}
 }
 
 func FindProviderID(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type CheckID struct {
 		Id uint
 	}
@@ -517,22 +606,34 @@ func FindProviderID(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkID)
-	if err := dbConnect.First(&informationProvider, "id=?", checkID.Id).Error; err != nil {
+	if err := database.DBConn().First(&informationProvider, "id=?", checkID.Id).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": informationProvider})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	}
 }
 
 func FindPriceOfServices(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type CheckID struct {
 		Id string
 	}
@@ -547,25 +648,37 @@ func FindPriceOfServices(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkID)
-	if err := dbConnect.Raw(
+	if err := database.DBConn().Raw(
 		"SELECT services.name_services, services_of_providers.price, providers.name from"+
 			" services_of_providers,services,providers WHERE services_of_providers.services_id = services.id and"+
 			" services_of_providers.provider_id = providers.id and providers.id = ?", checkID.Id).Scan(&price).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": price})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 		return
 	}
 }
 
 func AddPrice(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type CheckInformation struct {
 		Id           uint
 		NameServices string
@@ -578,30 +691,50 @@ func AddPrice(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkInformation)
-	if err := dbConnect.First(&services, "name_services=?", &checkInformation.NameServices).Error; err != nil {
+	if err := database.DBConn().First(&services, "name_services=?", &checkInformation.NameServices).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
 		return
 	} else {
 		fmt.Println(">>>>>>", services.ID, checkInformation.Price)
-		if err := dbConnect.Where("services_id=? and provider_id=?", services.ID, checkInformation.Id).First(&servicesOfProvider).Error; err != nil {
+		if err := database.DBConn().Where("services_id=? and provider_id=?", services.ID, checkInformation.Id).First(&servicesOfProvider).Error; err != nil {
 			NewServicesOfProvider := models.ServicesOfProvider{
 				ServicesId: services.ID,
 				ProviderID: checkInformation.Id,
 				Price:      checkInformation.Price,
 			}
-			if err := dbConnect.Create(&NewServicesOfProvider).Error; err != nil {
+			if err := database.DBConn().Create(&NewServicesOfProvider).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "False"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "True"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			}
 		} else {
-			if err := dbConnect.Model(&servicesOfProvider).Where("services_id=?", services.ID).Update("price", checkInformation.Price).Error; err != nil {
+			if err := database.DBConn().Model(&servicesOfProvider).Where("services_id=?", services.ID).Update("price", checkInformation.Price).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "Update thất bại"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "Update thành công"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 				return
 			}
 		}
@@ -609,41 +742,65 @@ func AddPrice(c *gin.Context) {
 }
 
 func AddTodoList(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	var requirementcustomer models.RequirementsCustomer
 	var addTodoList models.ToDoList
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &addTodoList)
-	if err := dbConnect.First(&requirementcustomer, "id=?", addTodoList.RequirementsCustomerID).Error; err != nil {
+	if err := database.DBConn().First(&requirementcustomer, "id=?", addTodoList.RequirementsCustomerID).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "Không thấy"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	} else {
 		if requirementcustomer.Status == 0 {
-			if err := dbConnect.Create(&addTodoList).Error; err != nil {
+			if err := database.DBConn().Create(&addTodoList).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "False"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 			} else {
-				dbConnect.Model(&requirementcustomer).Where("id=?", addTodoList.RequirementsCustomerID).Update("status", 1)
+				database.DBConn().Model(&requirementcustomer).Where("id=?", addTodoList.RequirementsCustomerID).Update("status", 1)
 				c.JSON(http.StatusOK, gin.H{"result": "True"})
+				sqlDB, err := database.DBConn().DB()
+				if err != nil {
+					log.Fatalln(err)
+				}
+				defer sqlDB.Close()
 			}
 		} else {
 			c.JSON(http.StatusOK, gin.H{"result": "Công việc đã được người khác nhận"})
+			sqlDB, err := database.DBConn().DB()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			defer sqlDB.Close()
 		}
 	}
 }
 
 func CountPaginationRequirement(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type Count struct {
 		Count uint
 	}
@@ -656,10 +813,20 @@ func CountPaginationRequirement(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkStatus)
-	if err := dbConnect.Raw("SELECT COUNT(requirements_customers.id) AS "+"Count"+" FROM `requirements_customers` WHERE requirements_customers.status = ?", checkStatus.Status).Scan(&count).Error; err != nil {
+	if err := database.DBConn().Raw("SELECT COUNT(requirements_customers.id) AS "+"Count"+" FROM `requirements_customers` WHERE requirements_customers.status = ?", checkStatus.Status).Scan(&count).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": count})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	}
 }
 func CountPaginationToDoList(c *gin.Context) {
@@ -685,18 +852,30 @@ func CountPaginationToDoList(c *gin.Context) {
 	fmt.Println(checkStatus)
 	if err := dbConnect.Raw("SELECT COUNT(to_do_lists.id) AS "+"Count"+" FROM to_do_lists WHERE to_do_lists.status = ? AND to_do_lists.provider_id = ?", checkStatus.Status, checkStatus.ProviderId).Scan(&count).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := dbConnect.DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": count})
+		sqlDB, err := dbConnect.DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	}
 }
 
 func UpdateTodoList(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type GetInformation struct {
 		ProviderId            uint
 		RequirementCustomerId uint
@@ -708,20 +887,32 @@ func UpdateTodoList(c *gin.Context) {
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &getInformation)
 	fmt.Println("><<<<<<<<<<<<<<<<<<<<<", getInformation)
-	if err := dbConnect.Raw("UPDATE to_do_lists set status = 1, day_end = CURRENT_DATE WHERE provider_id = ? and requirements_customer_id  = ?", getInformation.ProviderId, getInformation.RequirementCustomerId).Scan(&updateTodoList).Error; err != nil {
+	if err := database.DBConn().Raw("UPDATE to_do_lists set status = 1, day_end = CURRENT_DATE WHERE provider_id = ? and requirements_customer_id  = ?", getInformation.ProviderId, getInformation.RequirementCustomerId).Scan(&updateTodoList).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": "True"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	}
 }
 
 func DeleteServicesProvider(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type Information struct {
 		ProviderId uint
 		ServicesId uint
@@ -732,21 +923,33 @@ func DeleteServicesProvider(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &information)
-	if err := dbConnect.Raw("DELETE FROM `services_of_providers` WHERE provider_id = ? and services_id = ?", information.ProviderId, information.ServicesId).Scan(&deleteservices).Error; err != nil {
+	if err := database.DBConn().Raw("DELETE FROM `services_of_providers` WHERE provider_id = ? and services_id = ?", information.ProviderId, information.ServicesId).Scan(&deleteservices).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": "True"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	}
 }
 
 //webSocket returns json format
 func AABBCC(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	//Upgrade get request to webSocket protocol
 	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -773,7 +976,7 @@ func AABBCC(c *gin.Context) {
 	var getServices []GetServices
 	for {
 
-		dbConnect.Raw("SELECT services_of_providers.services_id,services.name_services, services_of_providers.price, services_of_providers.provider_id FROM"+
+		database.DBConn().Raw("SELECT services_of_providers.services_id,services.name_services, services_of_providers.price, services_of_providers.provider_id FROM"+
 			" `services_of_providers` LEFT JOIN services on services_of_providers.services_id = services.id"+
 			" WHERE services_of_providers.provider_id = ?", data.A).Scan(&getServices)
 
@@ -851,12 +1054,14 @@ func HistoryList(c *gin.Context) {
 }
 
 func UpdateInformationProvider(c *gin.Context) {
-	dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	/* dbConnect, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	sqlDB, err := dbConnect.DB()
+	sqlDB.SetConnMaxLifetime(time.Hour)
 	if err != nil {
 		panic("failed to connect database.")
 	} else {
 		fmt.Println("connect Successfull.")
-	}
+	} */
 	type GetInformation struct {
 		ProviderId uint
 		Name       string
@@ -871,9 +1076,19 @@ func UpdateInformationProvider(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &getInformation)
-	if err := dbConnect.Raw("UPDATE providers set name= ?, address= ?, cccd= ?, phone= ?, introduce= ? WHERE id = ?", getInformation.Name, getInformation.Address, getInformation.Phone, getInformation.CCCD, getInformation.introduce, getInformation.ProviderId).Scan(&updateProvider).Error; err != nil {
+	if err := database.DBConn().Raw("UPDATE providers set name= ?, address= ?, cccd= ?, phone= ?, introduce= ? WHERE id = ?", getInformation.Name, getInformation.Address, getInformation.Phone, getInformation.CCCD, getInformation.introduce, getInformation.ProviderId).Scan(&updateProvider).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": getInformation})
+		sqlDB, err := database.DBConn().DB()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer sqlDB.Close()
 	}
 }
