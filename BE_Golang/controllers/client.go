@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"API_House_Kepping/BE_Golang/BE_Golang/create_database/models"
-	database "API_House_Kepping/BE_Golang/Be_Golang/connectDatabase"
+	connectdatabase "API_House_Kepping/BE_Golang/Be_Golang/connectDatabase"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -144,23 +144,23 @@ func AddRequirementCustomer(c *gin.Context) {
 	}
 	json.Unmarshal([]byte(res), &checkCustomer)
 	abc := checkCustomer.Name
-	if err := database.DBConn().Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer).Error; err != nil {
+	if err := connectdatabase.DBConn().Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer).Error; err != nil {
 		NewCustomer := models.Customer{
 			NameCustomer:    checkCustomer.Name,
 			AddressCustomer: checkCustomer.Address,
 			PhoneCustomer:   checkCustomer.Phone,
 		}
 		fmt.Println("THEM KH", NewCustomer)
-		if err := database.DBConn().Create(&NewCustomer).Error; err != nil {
+		if err := connectdatabase.DBConn().Create(&NewCustomer).Error; err != nil {
 			c.JSON(http.StatusOK, gin.H{"result": "Không  insert Khách Hàng được"})
-			sqlDB, err := database.DBConn().DB()
+			sqlDB, err := connectdatabase.DBConn().DB()
 			if err != nil {
 				log.Fatalln(err)
 			}
 			defer sqlDB.Close()
 			return
 		} else {
-			database.DBConn().Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer)
+			connectdatabase.DBConn().Where("name_customer = ? AND  address_customer = ?", abc, checkCustomer.Address).First(&Customer)
 			NewRequirement := models.RequirementsCustomer{
 				CustomerID:   Customer.ID,
 				NameServices: checkCustomer.NameServices,
@@ -168,10 +168,10 @@ func AddRequirementCustomer(c *gin.Context) {
 				TimeStart:    checkCustomer.TimeStart,
 			}
 			fmt.Println(">>requirement", NewRequirement)
-			if err := database.DBConn().Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
-				if err := database.DBConn().Create(&NewRequirement).Error; err != nil {
+			if err := connectdatabase.DBConn().Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
+				if err := connectdatabase.DBConn().Create(&NewRequirement).Error; err != nil {
 					c.JSON(http.StatusOK, gin.H{"result": "create - không Insert yêu cầu khách hàng insert được"})
-					sqlDB, err := database.DBConn().DB()
+					sqlDB, err := connectdatabase.DBConn().DB()
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -179,7 +179,7 @@ func AddRequirementCustomer(c *gin.Context) {
 					return
 				} else {
 					c.JSON(http.StatusOK, gin.H{"result": "Insert yêu cầu khách hàng thành công"})
-					sqlDB, err := database.DBConn().DB()
+					sqlDB, err := connectdatabase.DBConn().DB()
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -187,9 +187,9 @@ func AddRequirementCustomer(c *gin.Context) {
 					return
 				}
 			} else {
-				if err := database.DBConn().Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
+				if err := connectdatabase.DBConn().Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
 					c.JSON(http.StatusOK, gin.H{"result": "Không Update được"})
-					sqlDB, err := database.DBConn().DB()
+					sqlDB, err := connectdatabase.DBConn().DB()
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -197,7 +197,7 @@ func AddRequirementCustomer(c *gin.Context) {
 					return
 				} else {
 					c.JSON(http.StatusOK, gin.H{"result": "Update thành công"})
-					sqlDB, err := database.DBConn().DB()
+					sqlDB, err := connectdatabase.DBConn().DB()
 					if err != nil {
 						log.Fatalln(err)
 					}
@@ -213,10 +213,10 @@ func AddRequirementCustomer(c *gin.Context) {
 			DayStart:     checkCustomer.DayStart,
 			TimeStart:    checkCustomer.TimeStart,
 		}
-		if err := database.DBConn().Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
-			if err := database.DBConn().Create(&NewRequirement).Error; err != nil {
+		if err := connectdatabase.DBConn().Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).First(&Requirement).Error; err != nil {
+			if err := connectdatabase.DBConn().Create(&NewRequirement).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "không Insert yêu cầu khách hàng insert được"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -224,7 +224,7 @@ func AddRequirementCustomer(c *gin.Context) {
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "Insert yêu cầu khách hàng thành công"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -232,9 +232,9 @@ func AddRequirementCustomer(c *gin.Context) {
 				return
 			}
 		} else {
-			if err := database.DBConn().Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
+			if err := connectdatabase.DBConn().Model(&NewRequirement).Where("customer_id = ? AND day_start = ? AND time_start = ? ", NewRequirement.CustomerID, NewRequirement.DayStart, NewRequirement.TimeStart).Update("name_services", NewRequirement.NameServices).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "Không Update được"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -242,7 +242,7 @@ func AddRequirementCustomer(c *gin.Context) {
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "Update thành công"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -347,9 +347,9 @@ func AddServiceProvider(c *gin.Context) {
 		ProviderID: getServicesOfProvider.ProviderId,
 		Price:      getServicesOfProvider.Price,
 	}
-	if err := database.DBConn().Create(&AddNewServiceProvider).Error; err != nil {
+	if err := connectdatabase.DBConn().Create(&AddNewServiceProvider).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -357,7 +357,7 @@ func AddServiceProvider(c *gin.Context) {
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": "true"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -569,9 +569,9 @@ func Loggin(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkLoggin)
-	if err := database.DBConn().Where("user_name = ? and password = ?", checkLoggin.User, checkLoggin.Password).First(&informationLoggin).Error; err != nil {
+	if err := connectdatabase.DBConn().Where("user_name = ? and password = ?", checkLoggin.User, checkLoggin.Password).First(&informationLoggin).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -579,7 +579,7 @@ func Loggin(c *gin.Context) {
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": informationLoggin})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -606,9 +606,9 @@ func FindProviderID(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkID)
-	if err := database.DBConn().First(&informationProvider, "id=?", checkID.Id).Error; err != nil {
+	if err := connectdatabase.DBConn().First(&informationProvider, "id=?", checkID.Id).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -616,7 +616,7 @@ func FindProviderID(c *gin.Context) {
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": informationProvider})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -648,12 +648,12 @@ func FindPriceOfServices(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkID)
-	if err := database.DBConn().Raw(
+	if err := connectdatabase.DBConn().Raw(
 		"SELECT services.name_services, services_of_providers.price, providers.name from"+
 			" services_of_providers,services,providers WHERE services_of_providers.services_id = services.id and"+
 			" services_of_providers.provider_id = providers.id and providers.id = ?", checkID.Id).Scan(&price).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -661,7 +661,7 @@ func FindPriceOfServices(c *gin.Context) {
 		return
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": price})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -691,20 +691,20 @@ func AddPrice(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkInformation)
-	if err := database.DBConn().First(&services, "name_services=?", &checkInformation.NameServices).Error; err != nil {
+	if err := connectdatabase.DBConn().First(&services, "name_services=?", &checkInformation.NameServices).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
 		return
 	} else {
 		fmt.Println(">>>>>>", services.ID, checkInformation.Price)
-		if err := database.DBConn().Where("services_id=? and provider_id=?", services.ID, checkInformation.Id).First(&servicesOfProvider).Error; err != nil {
+		if err := connectdatabase.DBConn().Where("services_id=? and provider_id=?", services.ID, checkInformation.Id).First(&servicesOfProvider).Error; err != nil {
 			NewServicesOfProvider := models.ServicesOfProvider{
 				ServicesId: services.ID,
 				ProviderID: checkInformation.Id,
 				Price:      checkInformation.Price,
 			}
-			if err := database.DBConn().Create(&NewServicesOfProvider).Error; err != nil {
+			if err := connectdatabase.DBConn().Create(&NewServicesOfProvider).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "False"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -712,7 +712,7 @@ func AddPrice(c *gin.Context) {
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "True"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -720,9 +720,9 @@ func AddPrice(c *gin.Context) {
 				return
 			}
 		} else {
-			if err := database.DBConn().Model(&servicesOfProvider).Where("services_id=?", services.ID).Update("price", checkInformation.Price).Error; err != nil {
+			if err := connectdatabase.DBConn().Model(&servicesOfProvider).Where("services_id=?", services.ID).Update("price", checkInformation.Price).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "Update thất bại"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -730,7 +730,7 @@ func AddPrice(c *gin.Context) {
 				return
 			} else {
 				c.JSON(http.StatusOK, gin.H{"result": "Update thành công"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -756,26 +756,26 @@ func AddTodoList(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &addTodoList)
-	if err := database.DBConn().First(&requirementcustomer, "id=?", addTodoList.RequirementsCustomerID).Error; err != nil {
+	if err := connectdatabase.DBConn().First(&requirementcustomer, "id=?", addTodoList.RequirementsCustomerID).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "Không thấy"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
 		defer sqlDB.Close()
 	} else {
 		if requirementcustomer.Status == 0 {
-			if err := database.DBConn().Create(&addTodoList).Error; err != nil {
+			if err := connectdatabase.DBConn().Create(&addTodoList).Error; err != nil {
 				c.JSON(http.StatusOK, gin.H{"result": "False"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
 				defer sqlDB.Close()
 			} else {
-				database.DBConn().Model(&requirementcustomer).Where("id=?", addTodoList.RequirementsCustomerID).Update("status", 1)
+				connectdatabase.DBConn().Model(&requirementcustomer).Where("id=?", addTodoList.RequirementsCustomerID).Update("status", 1)
 				c.JSON(http.StatusOK, gin.H{"result": "True"})
-				sqlDB, err := database.DBConn().DB()
+				sqlDB, err := connectdatabase.DBConn().DB()
 				if err != nil {
 					log.Fatalln(err)
 				}
@@ -783,7 +783,7 @@ func AddTodoList(c *gin.Context) {
 			}
 		} else {
 			c.JSON(http.StatusOK, gin.H{"result": "Công việc đã được người khác nhận"})
-			sqlDB, err := database.DBConn().DB()
+			sqlDB, err := connectdatabase.DBConn().DB()
 			if err != nil {
 				log.Fatalln(err)
 			}
@@ -813,16 +813,16 @@ func CountPaginationRequirement(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &checkStatus)
-	if err := database.DBConn().Raw("SELECT COUNT(requirements_customers.id) AS "+"Count"+" FROM `requirements_customers` WHERE requirements_customers.status = ?", checkStatus.Status).Scan(&count).Error; err != nil {
+	if err := connectdatabase.DBConn().Raw("SELECT COUNT(requirements_customers.id) AS "+"Count"+" FROM `requirements_customers` WHERE requirements_customers.status = ?", checkStatus.Status).Scan(&count).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
 		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": count})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -887,16 +887,16 @@ func UpdateTodoList(c *gin.Context) {
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &getInformation)
 	fmt.Println("><<<<<<<<<<<<<<<<<<<<<", getInformation)
-	if err := database.DBConn().Raw("UPDATE to_do_lists set status = 1, day_end = CURRENT_DATE WHERE provider_id = ? and requirements_customer_id  = ?", getInformation.ProviderId, getInformation.RequirementCustomerId).Scan(&updateTodoList).Error; err != nil {
+	if err := connectdatabase.DBConn().Raw("UPDATE to_do_lists set status = 1, day_end = CURRENT_DATE WHERE provider_id = ? and requirements_customer_id  = ?", getInformation.ProviderId, getInformation.RequirementCustomerId).Scan(&updateTodoList).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
 		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": "True"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -923,16 +923,16 @@ func DeleteServicesProvider(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &information)
-	if err := database.DBConn().Raw("DELETE FROM `services_of_providers` WHERE provider_id = ? and services_id = ?", information.ProviderId, information.ServicesId).Scan(&deleteservices).Error; err != nil {
+	if err := connectdatabase.DBConn().Raw("DELETE FROM `services_of_providers` WHERE provider_id = ? and services_id = ?", information.ProviderId, information.ServicesId).Scan(&deleteservices).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
 		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": "True"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -976,7 +976,7 @@ func AABBCC(c *gin.Context) {
 	var getServices []GetServices
 	for {
 
-		database.DBConn().Raw("SELECT services_of_providers.services_id,services.name_services, services_of_providers.price, services_of_providers.provider_id FROM"+
+		connectdatabase.DBConn().Raw("SELECT services_of_providers.services_id,services.name_services, services_of_providers.price, services_of_providers.provider_id FROM"+
 			" `services_of_providers` LEFT JOIN services on services_of_providers.services_id = services.id"+
 			" WHERE services_of_providers.provider_id = ?", data.A).Scan(&getServices)
 
@@ -1076,16 +1076,16 @@ func UpdateInformationProvider(c *gin.Context) {
 	buf.ReadFrom(c.Request.Body)
 	newString := buf.String()
 	json.Unmarshal([]byte(newString), &getInformation)
-	if err := database.DBConn().Raw("UPDATE providers set name= ?, address= ?, cccd= ?, phone= ?, introduce= ? WHERE id = ?", getInformation.Name, getInformation.Address, getInformation.Phone, getInformation.CCCD, getInformation.introduce, getInformation.ProviderId).Scan(&updateProvider).Error; err != nil {
+	if err := connectdatabase.DBConn().Raw("UPDATE providers set name= ?, address= ?, cccd= ?, phone= ?, introduce= ? WHERE id = ?", getInformation.Name, getInformation.Address, getInformation.Phone, getInformation.CCCD, getInformation.introduce, getInformation.ProviderId).Scan(&updateProvider).Error; err != nil {
 		c.JSON(http.StatusOK, gin.H{"result": "False"})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
 		defer sqlDB.Close()
 	} else {
 		c.JSON(http.StatusOK, gin.H{"result": getInformation})
-		sqlDB, err := database.DBConn().DB()
+		sqlDB, err := connectdatabase.DBConn().DB()
 		if err != nil {
 			log.Fatalln(err)
 		}
