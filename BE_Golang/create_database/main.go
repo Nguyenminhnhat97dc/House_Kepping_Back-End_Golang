@@ -1,7 +1,7 @@
 package main
 
 import (
-	"BE_Golang/BE_Golang/create_database/models"
+	"API_House_Kepping/BE_Golang/BE_Golang/create_database/models"
 	"fmt"
 
 	//"gorm.io/driver/postgres"

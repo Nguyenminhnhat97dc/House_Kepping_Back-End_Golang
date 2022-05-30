@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"BE_Golang/BE_Golang/create_database/models"
-	database "BE_Golang/Be_Golang/connectDatabase"
+	"API_House_Kepping/BE_Golang/BE_Golang/create_database/models"
+	database "API_House_Kepping/BE_Golang/Be_Golang/connectDatabase"
 	"bytes"
 	"encoding/json"
 	"fmt"

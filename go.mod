@@ -1,4 +1,4 @@
-module BE_Golang
+module API_House_Kepping/BE_Golang
 
 go 1.18
 
