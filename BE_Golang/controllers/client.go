@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"API_House_Kepping/BE_Golang/BE_Golang/create_database/models"
-	connectdatabase "API_House_Kepping/BE_Golang/Be_Golang/connectDatabase"
+	connectdatabase "API_House_Kepping/BE_Golang/Be_Golang/connectDatabase/connect"
 	"bytes"
 	"encoding/json"
 	"fmt"
